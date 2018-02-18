@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Friends Finder : Survey</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div id="main" class="container-fluid" style="padding-top:5%;padding-left:10%;padding-right:40%;">
+        <div class="container-fluid">
+            <h1 style="color:green">Survey Question </h1>
+            <hr>
+        </div>
+        <h3>About You</h3>
+        <form>
+            <div id="personalInfo" class="form-group">
+                <label for="name"> Name (Required)</label>
+                <input type="text" class="form-control" id="name" placeholder="Name">
+                <label for="photo"> Link to Photo Image (Required) </label>
+                <input type="text" class="form-control" id="photo" placeholder="Photo">
+            </div>
+            <div id="questions">
+                <!-- insert question using script -->
+            </div>
+            <button class='btn btn-primary' id="submit" type='submit' style="margin-top:5%">Submit form</button>
+        </form>
+    </div>
+</body>
+
+<script src="http://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+
+<script>
+    let questionhtml = "";
+    let questions = ['Your mind is always buzzing with unexplored ideas and plans.', 'Generally speaking, you rely more on your experience than your imagination.', 'You find it easy to stay relaxed and focused even when there is some pressure.', 'You rarely do something just out of sheer curiosity.', 'People can rarely upset you.', 'It is often difficult for you to relate to other people’s feelings.', 'In a discussion, truth should be more important than people’s sensitivities.', 'You rarely get carried away by fantasies and ideas.', 'You think that everyone’s views should be respected regardless of whether they are supported by facts or not.', 'You feel more energetic after spending time with a group of people.'];
+    for (i = 1; i <= 10; i++) {
+        questionhtml = questionhtml + "<label class='my-1 mr-2' for='inlineFormCustomSelectPref'>";
+        questionhtml = questionhtml + "<h5 style='font-weight:bold;'> Question:" + i + "</h5>";
+        questionhtml = questionhtml + "<h5>" + questions[i - 1] + "</h5>";
+        questionhtml = questionhtml + "</label>";
+        questionhtml = questionhtml + "<select id ='option" + i + "' class='custom-select my-1 mr-sm-2' id='inlineFormCustomSelectPref'>";
+        questionhtml = questionhtml + "<option selected>Choose...</option>"
+        questionhtml = questionhtml + "<option value='1'>1 (Strongly Disagree)</option>";
+        questionhtml = questionhtml + "<option value='2'>2</option>";
+        questionhtml = questionhtml + "<option value='3'>3</option>";
+        questionhtml = questionhtml + "<option value='4'>4</option>";
+        questionhtml = questionhtml + "<option value='4'>5(Strongly Agree)</option>";
+        questionhtml = questionhtml + "</select>";
+    }
+    $("#questions").append(questionhtml);
+
+
+    $('#submit').on('click', function(event) {
+
+        let optionArr = [];
+
+        event.preventDefault();
+
+        for (i = 1; i < 11; i++) {
+            if ($("#option" + i + " option:selected").val() === "Choose...")
+                value = 0
+            else
+                value = $("#option" + i + " option:selected").val()
+            optionArr.push(value);
+        }
+
+        inputObj = {
+            name: $("#name").val().trim(),
+            photo: $("#photo").val().trim(),
+            scores: optionArr,
+        };
+
+        console.log(inputObj);
+
+        $.ajax({
+            type: "POST",
+            url: "/api/friends",
+            data: inputObj,
+        });
+    });
+</script>
+
+</html>
