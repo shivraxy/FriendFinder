@@ -48,7 +48,7 @@
         questionhtml = questionhtml + "<option value='2'>2</option>";
         questionhtml = questionhtml + "<option value='3'>3</option>";
         questionhtml = questionhtml + "<option value='4'>4</option>";
-        questionhtml = questionhtml + "<option value='4'>5(Strongly Agree)</option>";
+        questionhtml = questionhtml + "<option value='5'>5(Strongly Agree)</option>";
         questionhtml = questionhtml + "</select>";
     }
     $("#questions").append(questionhtml);
@@ -64,14 +64,14 @@
             if ($("#option" + i + " option:selected").val() === "Choose...")
                 value = 0
             else
-                value = $("#option" + i + " option:selected").val()
+                value = $("#option" + i + " option:selected").val().trim();
             optionArr.push(value);
         }
 
         inputObj = {
-            name: $("#name").val().trim(),
-            photo: $("#photo").val().trim(),
-            scores: optionArr,
+            "name": $("#name").val().trim(),
+            "photo": $("#photo").val().trim(),
+            "scores[]": optionArr,
         };
 
         console.log(inputObj);
@@ -79,7 +79,7 @@
         $.ajax({
             type: "POST",
             url: "/api/friends",
-            data: inputObj,
+            data: JSON.parse(JSON.stringify(inputObj)),
         });
     });
 </script>
