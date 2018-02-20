@@ -30,6 +30,8 @@
             <button class='btn btn-primary' id="submit" type='submit' style="margin-top:5%">Submit form</button>
         </form>
     </div>
+    <div id="modal-div">
+    </div>
 </body>
 
 <script src="http://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
@@ -65,21 +67,22 @@
                 value = 0
             else
                 value = $("#option" + i + " option:selected").val().trim();
-            optionArr.push(value);
+            optionArr.push(parseFloat(value));
         }
 
         inputObj = {
             "name": $("#name").val().trim(),
             "photo": $("#photo").val().trim(),
-            "scores[]": optionArr,
+            "scores": optionArr,
         };
-
-        console.log(inputObj);
 
         $.ajax({
             type: "POST",
             url: "/api/friends",
             data: JSON.parse(JSON.stringify(inputObj)),
+            success: function(response) {
+                alert(response);
+            }
         });
     });
 </script>

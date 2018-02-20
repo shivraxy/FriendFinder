@@ -3,6 +3,7 @@ let router = express.Router();
 let path = require("path");
 let fs = require("fs");
 let bodyParser = require("body-parser");
+let friends = require('../data/friends');
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
@@ -20,12 +21,7 @@ router.get("/", function(request, response) {
 
 //not sure how to put in another file
 router.get("/api/friends", function(request, response) {
-
-    var data = fs.readFileSync("./app/data/friends.js", 'utf8');
-    var parsed = data.split('\n').map(function(e) {
-        return e.split(', ');
-    })
-    response.send(parsed);
+    response.send(friends.data);
     response.end();
 });
 
@@ -36,46 +32,46 @@ router.post("/api/friends", function(request, response) {
         photoURL: "",
         TotalDiff: 0
     }
+
     let json;
-    let scoreDiff = 0;
+    let scoreDiff;
+    //Loop though all the friends in the file
 
-    fs.readFile("./app/data/friends.json", function(err, data) {
-
-        let allfriends = JSON.parse(data); // getting the data as an array
-
-        //Loop though all the friends in the file
-        for (let i = 0; i < allfriends.length; i++) {
-            scoreDiff = 0;
-
-
-            array = JSON.parse(JSON.stringify(request.body));
-            console.log(array);
-            console.log(array.scores[0]);
-
-            //loop through all the scores for a single friend.
-            for (j = 0; j < allfriends[i].scores.length; j++) {
-                if (parseFloat(allfriends[i].scores[j]) === parseFloat(request.body.scores[j]))
-                    scoreDiff = scoreDiff + 0;
-                else
-                    scoreDiff = scoreDiff + abs(parseFloat(allfriends[i].scores[j]) - parseFloat(request.body.scores[j]));
-            }
-
-            //if current friend diff is less than matchedUserDiff then replace otherwise dont do anything
-
-            if (scoreDiff < matchedUser.TotalDiff) {
-                matchedUser.name = allfriends[i].name;
-                matchedUser.photoURL = allfriends[i].photo;
-                matchedUser.TotalDiff = scoreDiff;
-            }
-
+    for (let i = 0; i < friends.data.length; i++) {
+        scoreDiff = 0;
+        array = JSON.parse(JSON.stringify(request.body));
+        //loop through all the scores for a single friend.
+        for (j = 0; j < friends.data[i].scores.length; j++) {
+            if (parseFloat(friends.data[i].scores[j]) === parseFloat(array['scores[]'][j]))
+                scoreDiff = scoreDiff + 0;
+            else
+                scoreDiff = scoreDiff + Math.abs(parseFloat(friends.data[i].scores[j]) - parseFloat(array['scores[]'][j]));
         }
 
-        console.log(Mathed + matchedUser.name);
+        if (i === 0) {
+            matchedUser.name = friends.data[i].name;
+            matchedUser.photoURL = friends.data[i].photo;
+            matchedUser.TotalDiff = scoreDiff;
+        }
 
-        fs.appendFileSync("./app/data/friends.json", ',' + JSON.stringify(request.body, null, 4));
-    })
+        //if current friend diff is less than matchedUserDiff then replace otherwise dont do anything
 
+        if (matchedUser.TotalDiff > scoreDiff) {
+            matchedUser.name = friends.data[i].name;
+            matchedUser.photoURL = friends.data[i].photo;
+            matchedUser.TotalDiff = scoreDiff;
+        }
 
-});
+        console.log('Name : ' + friends.data[i].name + ' score >> ' + scoreDiff)
+    }
+
+    console.log('Finally Matched ' + matchedUser.name + ' Score >> ' + matchedUser.TotalDiff);
+    responseText = 'Finally Matched ' + matchedUser.name + ' Computed - Score: ' + matchedUser.TotalDiff;
+    //display modal
+
+    friends.data.push(array);
+    response.send(responseText);
+
+})
 
 module.exports = router;
